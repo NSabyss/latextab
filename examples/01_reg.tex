@@ -1,0 +1,32 @@
+\begin{table}[htbp]
+  \centering
+  \caption{ 线性回归结果 }
+  \label{tab:reg}
+  \small
+    \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+  \begin{tabular}{l*{2}{c}}
+    \toprule
+                        &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}\\
+                        &\multicolumn{1}{c}{Price}&\multicolumn{1}{c}{Price}\\
+    \midrule
+    Mileage (mpg)       &     -49.512         &     -86.789         \\
+                        &    (86.156)         &    (83.943)         \\
+    \addlinespace
+    Weight (lbs.)       &       1.747\sym{**} &       4.365\sym{***}\\
+                        &     (0.641)         &     (1.167)         \\
+    \addlinespace
+    Length (in.)        &                     &    -104.868\sym{*}  \\
+                        &                     &    (39.722)         \\
+    \addlinespace
+    Constant            &    1946.069         &   14542.434\sym{*}  \\
+                        &  (3597.050)         &  (5890.632)         \\
+    \midrule
+    N                   &          74         &          74         \\
+    r2                  &       0.293         &       0.357         \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% 表注：
+
+注：$^{*}p<0.05$，$^{**}p<0.01$，$^{***}p<0.001$；括号内为标准误。

@@ -1,0 +1,26 @@
+% ==============================================================================
+% 01 基础三线表（booktabs）：单 tabular，最通用
+% 适用于：频数表、百分比表、频数（百分比）表、均值表、简单描述统计表等
+% 可选二级表头：JSON 传 column_groups（{name,span,start,end}）+ first_header，
+%   自动渲染 \multicolumn + \cmidrule 二级分组表头；不传则渲染普通单行表头
+% 依赖：booktabs（thusetup 已加载）
+% 用法：列格式按列数写（l 左 / c 中 / r 右）
+% ==============================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{ {{ caption }} }
+  \label{tab:{{ label }}}
+  \small
+
+  \begin{tabular}{ {{ column_format }} }
+    \toprule
+    {% if column_groups %}{{ first_header }}{% for group in column_groups %}& \multicolumn{ {{ group.span }} }{c}{ {{ group.name }} }{% endfor %}\\
+    {% for group in column_groups %}\cmidrule(lr){ {{ group.start }}-{{ group.end }} } {% endfor %}
+
+    {% endif %}{% for col in columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+    \midrule
+    {% for row in rows %}{% for cell in row %}{{ cell }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+    {% endfor %}
+    \bottomrule
+  \end{tabular}
+\end{table}

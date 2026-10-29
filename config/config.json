@@ -1,0 +1,55 @@
+{
+    "name": "latextab",
+    "version": "0.1.1",
+
+    "description": "Stata to LaTeX automatic table system",
+
+    "environment": {
+        "python_required": true,
+        "python_version": ">=3.10",
+        "packages": [
+            "jinja2"
+        ]
+    },
+
+
+    "paths": {
+
+        "template_dir": "templates",
+
+        "preamble_file": "templates/_preamble.tex",
+
+        "python_dir": "code_py",
+
+        "ado_dir": "ado",
+
+        "json_output": "tmp_json",
+
+        "tex_output": "tmp_tex",
+
+        "pdf_output": "tmp_pdf"
+
+    },
+
+
+    "default": {
+
+        "template": "01_基础三线表.tex",
+
+        "latex_engine": "xelatex",
+
+        "encoding": "utf-8"
+
+    },
+
+
+    "latex": {
+
+        "table_style": "booktabs",
+
+        "font_size": "small",
+
+        "default_column_format": "lcccc"
+
+    }
+}

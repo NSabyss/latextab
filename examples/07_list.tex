@@ -1,0 +1,20 @@
+% ==============================================================================
+% 02 变量定义/编码表：p{} 定宽列承载长文本；变量名用 \texttt{}
+% 常用三列：变量 | 口径 | 定义与编码（列宽按内容调整）
+% rows 元素为 {varname, scope, definition}
+% ==============================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{ 变量定义表 }
+  \label{tab:list}
+  \small
+  \begin{tabular}{ p{3cm}p{4cm}p{7cm} }
+    \toprule
+变量 & 口径 & 定义与编码\\
+    \midrule
+\texttt{ make } & Make and model & \\
+\texttt{ foreign } & Car origin & 0=Domestic；1=Foreign\\
+\texttt{ rep78 } & Repair record 1978 & \\
+    \bottomrule
+  \end{tabular}
+\end{table}

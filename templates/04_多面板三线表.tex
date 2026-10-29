@@ -1,0 +1,23 @@
+% ==============================================================================
+% 04 多面板三线表：一个 table 内多个 tabular，面板 A/B/C 用文字分行
+% 每个 tabular 各自 \toprule...\bottomrule；面板间用 \vspace{0.5em} 分隔
+% 依赖：booktabs
+% ==============================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{ {{ caption }} }
+  \label{tab:{{ label }}}
+  \small
+
+  {% for panel in panels %}面板 {{ panel.name }}：{{ panel.title }}
+
+  \begin{tabular}{ {{ panel.column_format }} }
+    \toprule
+    {% for col in panel.columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+    \midrule
+    {% for row in panel.rows %}{% for cell in row %}{{ cell }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+    {% endfor %}
+    \bottomrule
+  \end{tabular}
+  {% if not loop.last %}\vspace{0.5em}{% endif %}{% endfor %}
+\end{table}

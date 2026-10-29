@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# LaTeX 中间产物与编译输出
+tmp_pdf/
+tmp_tex/
+tmp_json/
+*.pdf
+*.log
+*.aux
+*.out
+*.xdv
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# 本机开发配置
+.vscode/
+.latexmkrc

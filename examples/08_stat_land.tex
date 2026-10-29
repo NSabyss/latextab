@@ -1,0 +1,47 @@
+% ==============================================================================
+% 共享导言区（_preamble.tex）：独立编译时套在所有 body 片段之前
+% 由 json2tex.py 在 mode=independ 时读入，与 body 拼成完整文档
+% 增删宏包只改这一处；body 片段本身不含 \documentclass / \usepackage
+% ==============================================================================
+\documentclass[UTF8]{ctexart}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{threeparttable}
+\usepackage{siunitx}
+
+\begin{document}
+
+\begin{landscape}
+\begin{table}[htbp]
+  \centering
+  \caption{ 横向宽表（独立编译） }
+  \label{tab:statland}
+  \small
+  \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{c}{} &
+      \multicolumn{1}{r}{Price} &
+      \multicolumn{1}{r}{Mileage (mpg)} &
+      \multicolumn{1}{r}{Weight (lbs.)} &
+      \multicolumn{1}{r}{Headroom (in.)} \\
+    \midrule
+    \multicolumn{1}{l}{Mean} &
+      \multicolumn{1}{r}{6165.257} &
+      \multicolumn{1}{r}{21.2973} &
+      \multicolumn{1}{r}{3019.459} &
+      \multicolumn{1}{r}{2.993243} \\
+    \multicolumn{1}{l}{Standard deviation} &
+      \multicolumn{1}{r}{2949.496} &
+      \multicolumn{1}{r}{5.785503} &
+      \multicolumn{1}{r}{777.1936} &
+      \multicolumn{1}{r}{.8459948} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{landscape}
+\end{document}

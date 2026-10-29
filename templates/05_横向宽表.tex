@@ -1,0 +1,52 @@
+% ==============================================================================
+% 05 横向宽表：landscape + longtable
+% 用于列数较多、普通纵向页面放不下的表格
+% 特点：
+% 1. landscape 横向页面
+% 2. 不固定单元格宽度
+% 3. 根据 column_format 自动决定列数和对齐方式
+% 4. longtable 自动跨页
+% 5. 跨页时自动重复表头
+% 可选分组：JSON 传 groups（{name,rows}），按组名分行渲染；不传则渲染扁平 rows
+% 依赖：pdflscape + longtable + booktabs
+% ==============================================================================
+
+\begin{landscape}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{ {{ column_format }} }
+  \caption{ {{ caption }} }
+  \label{tab:{{ label }}} \\
+  \toprule
+  {% for col in columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+  \midrule
+  \endfirsthead
+  % --------------------------------------------------------------------------
+  % 后续页面重复的表头
+  % --------------------------------------------------------------------------
+  \multicolumn{ {{ ncols }} }{l}{\small 表~\ref{tab:{{ label }}}（续）} \\
+  \toprule
+  {% for col in columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+  \midrule
+  \endhead
+  % --------------------------------------------------------------------------
+  % 非最后一页底部
+  % --------------------------------------------------------------------------
+  \midrule
+  \multicolumn{ {{ ncols }} }{r}{\small 接下页} \\
+  \endfoot
+  % --------------------------------------------------------------------------
+  % 最后一页底部
+  % --------------------------------------------------------------------------
+  \bottomrule
+  \endlastfoot
+  % --------------------------------------------------------------------------
+  % 表格主体
+  % --------------------------------------------------------------------------
+  {% if groups %}{% for group in groups %}\multicolumn{ {{ ncols }} }{l}{\textbf{ {{ group.name }} }}\\
+  \midrule
+  {% for row in group.rows %}{% for cell in row %}{{ cell }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+  {% endfor %}{% if not loop.last %}\midrule{% endif %}{% endfor %}{% else %}{% for row in rows %}{% for cell in row %}{{ cell }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+  {% endfor %}{% endif %}
+\end{longtable}
+\end{landscape}

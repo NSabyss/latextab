@@ -1,0 +1,171 @@
+<a id="top"></a>
+
+## 目录
+
+- [一、latextab：自动化输出表格tex的代码实现方案](#一latextab自动化输出表格tex的代码实现方案)
+  - [【1】实现方案：Stata ado + JSON + Jinja2 + LaTeX template](#1实现方案stata-ado--json--jinja2--latex-template)
+  - [【2】实现流程](#2实现流程)
+  - [【3】具体实现方法](#3具体实现方法)
+    - [第一步：整理文件结构](#第一步整理文件结构)
+    - [第二步：安装所需命令包](#第二步安装所需命令包)
+    - [第三步：整理生成latex表格模板](#第三步整理生成latex表格模板)
+      - [（1）表格需求清单](#1表格需求清单)
+      - [（2）具体模板](#2具体模板)
+- [二、如何快速配置环境以使用latextab包](#二如何快速配置环境以使用latextab包)
+  - [【1】系统要求](#1系统要求)
+  - [【2】Python配置](#2python配置)
+    - [第一步：安装Python](#第一步安装python)
+    - [第二部：创建虚拟环境](#第二部创建虚拟环境)
+    - [第三步：安装依赖](#第三步安装依赖)
+  - [【3】Stata配置](#3stata配置)
+  - [【4】测试](#4测试)
+
+
+---
+<a id="sec-1"></a>
+# 一、latextab：自动化输出表格tex的代码实现方案
+<a id="sec-1-1"></a>
+## 【1】实现方案：包装 esttab / collect 生成 tex，再换表头统一三线表
+<a id="sec-1-2"></a>
+## 【2】实现流程
+      Stata：latextab（分发表头/描述/交叉/定义表）
+                ├─ reg           → 包装 esttab（读已存估计，t 分布星号）→ 原始 tex
+                ├─ tab/stat/table → 包装 collect/table（多级表头 + 小计）→ collect export tex
+                └─ list          → json2tex.py + Jinja2 模板（保留，无 collect 等价）
+                  ↓
+      Python：retex.py / json2tex.py 换表头 → booktabs 三线表
+                  ↓
+              table.tex
+                  |
+                  |
+             \input{}嵌入latex文件
+                  |得
+                  ↓到
+              thesis.pdf
+<a id="sec-1-3"></a>
+## 【3】具体实现方法
+### 第一步：整理文件结构
+    root(根目录示例F:\\.tools\latextab)
+    │
+    ├── setup                   # 安装说明
+    ├── compile.sh              # 编译 tmp_texoutput/ 的 tex，PDF 输出到 tmp_pdfoutput/
+    │
+    ├── config\
+    │   ├── config.json         # 配置文件
+    │   └── requirements.txt    # Python依赖
+    │                 
+    ├── code_py\                # retex.py（换表头）+ json2tex.py（list 专用）
+    │
+    ├── templates\
+    │   ├── 01~06_*.tex         # body 片段模板（\input 插入章节 / 独立编译共用）
+    │   ├── _preamble.tex       # 共享导言区（mode=independ 时套在 body 前）
+    │   └── README.md           # 模板索引与用法
+    │
+    ├── tmp_pdf\                # 编译预览的 PDF
+    │
+    └── tmp_tex\                # 编译预览的 tex
+
+    其他相关路径：
+    ado/                            # ado 目录：latextab.ado + _latextab_*.ado
+                                    # + doado_latextab.do + latextab.sthlp
+### 第二步：安装所需命令包
+    stata：
+        命令介绍https://www.lianxh.cn/details/1008.html
+        命令下载https://github.com/gn0
+    python：在运行环境下，终端运行pip install jinja2
+### 第三步：整理生成latex表格模板
+#### （1）表格需求清单
+| 论文表格需求 | 对应表格类型 | 对应 Stata 命令 | 对应模板要求 |
+| :--- | :--- | :--- | :--- |
+| **样本情况描述** | 样本筛选与分布表 | `tabulate` / 自定义频数统计 | **三线表**。需清晰展示初始样本、各阶段因数据缺失或异常而剔除的样本量、最终有效样本量，以及行业/地区分布频数。 |
+| **变量操作化列表** | 变量定义与说明表 | `describe` / `codebook` (辅助梳理) | **三线表**。列出变量类型（被解释变量、解释变量、控制变量等）、变量符号、变量名称及具体的操作化定义/计算公式。 |
+| **变量描述** | 变量特征说明表 | `summarize` / `codebook` | **三线表**。对变量的搜集背景、量表来源、特殊处理方式（如缩尾处理、对数化等）进行文字说明或列表展示。 |
+| **描述性统计** | 分类频数表 / 分组统计表 | `tabulate var [if] [in], [options]` <br>`tabstat var, by(group_var) statistics(mean sd min max)` <br>`bysort group_var: summarize var` | **三线表**。用于展示单变量或多变量交叉频数分布，或者按特定类别（如行业、所有制、年份等）进行分组的均值、标准差等指标对比。 |
+| **回归结果展示** | 回归分析结果表 | `regress` / `xtreg` / `esttab` / `outreg2` / `etable` | **三线表**。汇报核心回归系数，系数下方括号内为标准误（或 t 值/p 值），使用 \*、\*\*、\*\*\* 标明显著性水平；底部注明是否控制个体/时间固定效应、样本量及 R 方。 |
+
+#### （2）模板文件结构
+
+
+[返回顶部](#top)
+
+---
+
+<a id="sec-2"></a>
+# 二、如何快速配置环境以使用latextab包
+
+    考虑之后做一个install包，点击自动配置环境
+
+<a id="sec-2-1"></a>
+## 【1】系统要求
+- Windows 10/11
+- Python >=3.10
+- Stata 17+
+- LaTeX发行版
+
+<a id="sec-2-2"></a>
+## 【2】Python配置
+
+    如果已经安装过python，并且有常用的环境配置，不想专门为该工具创建环境，
+    在常用工作区安装好所需命令包，并在该环境下运行即可。
+
+### 第一步：安装Python
+
+确认：
+
+    python --version
+
+
+### 第二部：创建虚拟环境
+
+【进入工具目录】
+
+    cd latextab
+
+
+【创建】
+
+    python -m venv .venv
+
+
+【激活】
+
+
+
+    .venv\Scripts\activate  （在Windows系统中）
+
+### 第三步：安装依赖
+    pip install -r config/requirements.txt
+
+<a id="sec-2-3"></a>
+## 【3】Stata配置
+
+【运行一次安装入口（定义全局宏 + 加入搜索路径）】
+
+    cd "仓库根目录"                 // code_py/ 与 ado/ 所在目录
+    do doado_latextab.do
+
+【换机器 / 换目录时，本文件基本无需改动（root/ado 自动取当前目录）；】
+【仅当 python 不在 PATH 时，改 LATEXTAB_PYTHON 为完整路径。】
+LATEXTAB_ROOT（工具根目录）、LATEXTAB_PYTHON（Python 解释器）、
+LATEXTAB_ADO（ado 目录），无需改任何 .ado。
+
+【检查】
+
+    which latextab
+
+<a id="sec-2-4"></a>
+## 【4】测试
+
+【运行】
+
+    python code_py/json2tex.py
+
+如果输出    LaTeX generated successfully    说明配置成功。
+
+【编译预览（可选）】
+
+    bash compile.sh all               # 全部；单个：bash compile.sh 01_基础三线表
+
+脚本从 tmp_texoutput/ 取 tex 表格（程序生成），PDF 统一输出到 tmp_pdfoutput/ 目录。
+
+[返回顶部](#top)

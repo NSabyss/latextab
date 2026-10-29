@@ -1,0 +1,19 @@
+% ==============================================================================
+% 06 跨行分组表：multirow + addlinespace
+% 依赖：booktabs + multirow
+% ==============================================================================
+\begin{table}[htbp]
+\centering
+\caption{ {{ caption }} }
+\label{tab:{{ label }}}
+\small
+\begin{tabular}{ {{ column_format }} }
+\toprule
+{% for col in columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+\midrule
+{% for group in groups %}\multirow{ {{ group.span }} }{*}{ {{ group.name }} } & {{ group.rows[0][0] }}{% for cell in group.rows[0][1:] %} & {{ cell }}{% endfor %}\\
+{% for row in group.rows[1:] %}& {{ row[0] }}{% for cell in row[1:] %} & {{ cell }}{% endfor %}\\
+{% endfor %}{% if not loop.last %}\addlinespace{% endif %}{% endfor %}
+\bottomrule
+\end{tabular}
+\end{table}

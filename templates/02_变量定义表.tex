@@ -1,0 +1,19 @@
+% ==============================================================================
+% 02 变量定义/编码表：p{} 定宽列承载长文本；变量名用 \texttt{}
+% 常用三列：变量 | 口径 | 定义与编码（列宽按内容调整）
+% rows 元素为 {varname, scope, definition}
+% ==============================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{ {{ caption }} }
+  \label{tab:{{ label }}}
+  \small
+  \begin{tabular}{ {{ column_format }} }
+    \toprule
+    {% for col in columns %}{{ col }}{% if not loop.last %} & {% endif %}{% endfor %}\\
+    \midrule
+    {% for row in rows %}\texttt{ {{ row.varname }} } & {{ row.scope }} & {{ row.definition }}\\
+    {% endfor %}
+    \bottomrule
+  \end{tabular}
+\end{table}

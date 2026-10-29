@@ -1,0 +1,15 @@
+% ==============================================================================
+% 共享导言区（_preamble.tex）：独立编译时套在所有 body 片段之前
+% 由 json2tex.py 在 mode=independ 时读入，与 body 拼成完整文档
+% 增删宏包只改这一处；body 片段本身不含 \documentclass / \usepackage
+% ==============================================================================
+\documentclass[UTF8]{ctexart}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{threeparttable}
+\usepackage{siunitx}
