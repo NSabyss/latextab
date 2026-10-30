@@ -19,6 +19,7 @@
     - [第三步：安装依赖](#第三步安装依赖)
   - [【3】Stata配置](#3stata配置)
   - [【4】测试](#4测试)
+- [三、如何更新 GitHub 仓库](#三如何更新-github-仓库)
 
 
 ---
@@ -28,9 +29,9 @@
 ## 【1】实现方案：包装 esttab / collect 生成 tex，再换表头统一三线表
 <a id="sec-1-2"></a>
 ## 【2】实现流程
-      Stata：latextab（分发表头/描述/交叉/定义表）
+      Stata：latextab（5 个子命令：reg 回归 / stat 描述 / tab 交叉 / table 多级 / list 定义）
                 ├─ reg           → 包装 esttab（读已存估计，t 分布星号）→ 原始 tex
-                ├─ tab/stat/table → 包装 collect/table（多级表头 + 小计）→ collect export tex
+                ├─ tab/stat/table → 包装 table（collect 框架，多级表头 + 小计）→ collect export tex
                 └─ list          → json2tex.py + Jinja2 模板（保留，无 collect 等价）
                   ↓
       Python：retex.py / json2tex.py 换表头 → booktabs 三线表
@@ -48,7 +49,7 @@
     root(根目录示例F:\\.tools\latextab)
     │
     ├── setup                   # 安装说明
-    ├── compile.sh              # 编译 tmp_texoutput/ 的 tex，PDF 输出到 tmp_pdfoutput/
+    ├── .latexmkrc              # latexmk 编译路由（PDF 统一输出到 tmp_pdf/）
     │
     ├── config\
     │   ├── config.json         # 配置文件
@@ -66,13 +67,13 @@
     └── tmp_tex\                # 编译预览的 tex
 
     其他相关路径：
-    ado/                            # ado 目录：latextab.ado + _latextab_*.ado
-                                    # + doado_latextab.do + latextab.sthlp
+    ado/                            # Stata 命令：latextab.ado（主路由）+ _latextab_*.ado（子程序）
+                                    # + doado_latextab.do（安装入口）+ latextab.sthlp（帮助）
 ### 第二步：安装所需命令包
     stata：
-        命令介绍https://www.lianxh.cn/details/1008.html
-        命令下载https://github.com/gn0
-    python：在运行环境下，终端运行pip install jinja2
+        reg 子命令需装 estout（提供 esttab）：ssc install estout, replace
+        tab/stat/table 用的 table（collect 框架）为 Stata 17+ 内置，无需安装
+    python：终端运行 pip install jinja2
 ### 第三步：整理生成latex表格模板
 #### （1）表格需求清单
 | 论文表格需求 | 对应表格类型 | 对应 Stata 命令 | 对应模板要求 |
@@ -164,8 +165,38 @@ LATEXTAB_ADO（ado 目录），无需改任何 .ado。
 
 【编译预览（可选）】
 
-    bash compile.sh all               # 全部；单个：bash compile.sh 01_基础三线表
+    VS Code 绿色三角（latexmk + xelatex）编译 mode(independ) 生成的完整 tex；或手动 xelatex
 
-脚本从 tmp_texoutput/ 取 tex 表格（程序生成），PDF 统一输出到 tmp_pdfoutput/ 目录。
+PDF 统一输出到 tmp_pdf/ 目录（靠 .latexmkrc 条件路由），中间文件进 build/ 子目录。
+
+[返回顶部](#top)
+
+---
+
+<a id="sec-3"></a>
+# 三、如何更新 GitHub 仓库
+
+仓库地址：https://github.com/NSabyss/latextab
+
+本地改完代码后，在 `F:\.tools\latextab` 目录下，走三步：
+
+【1】暂存改动
+
+    git add -A
+
+【2】提交（写清楚改了什么）
+
+    git commit -m "一句话说明改动"
+
+【3】推送到 GitHub
+
+    git push
+
+改动即同步到远程仓库。常用补充：
+
+- `git status`：随时查看当前有哪些改动（改没改、改了哪些文件）。
+- 只提交部分文件：把 `git add -A` 换成 `git add <文件名>`（如 `git add ado/latextab.ado`），再 commit + push。
+- commit 信息建议：`fix: 修复 xxx` / `feat: 新增 xxx`，方便以后翻历史。
+- 若本地改了 `doado_latextab.do` 里的 `LATEXTAB_PYTHON`，不要 add 进去，远程保留通用的 `"python"` 默认值。
 
 [返回顶部](#top)
